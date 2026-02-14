@@ -267,6 +267,42 @@ h2 {
     }
 }
 
+.win-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #c2185b;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px 25px;
+    border-radius: 16px;
+    z-index: 10;
+    animation: winPop 0.5s ease-out;
+    text-align: center;
+    white-space: nowrap;
+}
+
+@keyframes winPop {
+    0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+    60% { transform: translate(-50%, -50%) scale(1.1); }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.confetti {
+    position: absolute;
+    top: -20px;
+    pointer-events: none;
+    animation: confettiFall linear forwards;
+    z-index: 5;
+}
+
+@keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(calc(40vh + 30px)) rotate(360deg); opacity: 0.5; }
+}
+
 #start-game-btn {
     background: #c2185b;
     color: white;
@@ -421,6 +457,73 @@ h2 {
     }
 }
 
+/* Firework trail (rocket going up) */
+.fw-trail {
+    position: absolute;
+    bottom: 0;
+    width: 3px;
+    height: 3px;
+    background: #ffd740;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 20;
+    animation: trailUp 0.4s ease-out forwards;
+    box-shadow: 0 0 6px #ffd740, 0 0 12px #ff6e40;
+}
+
+@keyframes trailUp {
+    0% {
+        bottom: 0;
+        opacity: 1;
+    }
+    100% {
+        bottom: calc(100% - var(--burst-y));
+        opacity: 0.5;
+    }
+}
+
+/* Firework burst particles */
+.fw-particle {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 20;
+    animation: particleBurst 1.2s ease-out forwards;
+}
+
+@keyframes particleBurst {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    70% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(0);
+        opacity: 0;
+    }
+}
+
+.memory-win-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 15px 25px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #c2185b;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    text-align: center;
+    z-index: 30;
+    animation: winPop 0.5s ease-out;
+    white-space: nowrap;
+}
+
 /* Balloon dodge game styles */
 #balloon-screen {
     text-align: center;
@@ -496,6 +599,56 @@ h2 {
     color: #c2185b;
     font-weight: 600;
     min-height: 30px;
+}
+
+.balloon-win-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 15px 25px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #c2185b;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    text-align: center;
+    z-index: 30;
+    animation: winPop 0.5s ease-out;
+    white-space: nowrap;
+}
+
+.real-confetti {
+    position: absolute;
+    top: -20px;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 20;
+    opacity: 0;
+    animation: confettiShower linear forwards;
+}
+
+@keyframes confettiShower {
+    0% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 1;
+    }
+    25% {
+        transform: translateY(25vh) translateX(calc(var(--drift) * 0.5)) rotate(180deg);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(50vh) translateX(var(--drift)) rotate(360deg);
+        opacity: 0.9;
+    }
+    75% {
+        transform: translateY(75vh) translateX(calc(var(--drift) * 0.7)) rotate(540deg);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateY(95vh) translateX(calc(var(--drift) * 0.3)) rotate(720deg);
+        opacity: 0;
+    }
 }
 
 /* Modal styles for enlarged photos */

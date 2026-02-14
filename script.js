@@ -319,18 +319,48 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show the photo gallery if player collected enough hearts
         if (heartsCollected >= 10) {
             firstGameCompleted = true;
+
+            // Show win message and confetti
+            showWinMessage();
+            createConfetti();
+
             setTimeout(function() {
                 gameScreen.classList.remove('active');
-                // Don't show photos yet - wait for second game completion
-                // Instead, show the second game screen
                 secondGameScreen.classList.add('active');
                 initializeMemoryGame();
-            }, 1500);
+                // Clean up confetti
+                document.querySelectorAll('.confetti').forEach(c => c.remove());
+            }, 3000);
         } else {
             // Just reset the game if they didn't collect enough
             setTimeout(function() {
                 resetGame();
             }, 500);
+        }
+    }
+
+    // Show win message overlay
+    function showWinMessage() {
+        const msg = document.createElement('div');
+        msg.className = 'win-message';
+        msg.innerHTML = '💘 You stole my heart! 🥰💕';
+        heartsContainer.appendChild(msg);
+    }
+
+    // Create confetti shower
+    function createConfetti() {
+        const confettiEmojis = ['🎉', '🎊', '💖', '💗', '✨', '💕', '🥰', '💘', '❤️', '🩷'];
+        const container = heartsContainer;
+
+        for (let i = 0; i < 40; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.fontSize = (0.8 + Math.random() * 1.2) + 'rem';
+            confetti.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+            confetti.style.animationDelay = (Math.random() * 0.8) + 's';
+            container.appendChild(confetti);
         }
     }
     
@@ -485,11 +515,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Check for win
                 if (matchedPairs === totalPairs) {
+                    // Show win message
+                    const msg = document.createElement('div');
+                    msg.className = 'memory-win-message';
+                    msg.innerHTML = '🧠✨ You are a genius! ✨💕';
+                    gameBoard.parentNode.appendChild(msg);
+
+                    // Launch fireworks
+                    createFireworks(secondGameScreen);
+
                     setTimeout(() => {
-                        // Player wins! Go to balloon dodge game
+                        msg.remove();
+                        secondGameScreen.querySelectorAll('.fw-trail, .fw-particle').forEach(f => f.remove());
                         secondGameScreen.classList.remove('active');
                         balloonScreen.classList.add('active');
-                    }, 500);
+                    }, 5000);
                 }
             } else {
                 // No match, flip cards back after delay
@@ -519,6 +559,53 @@ document.addEventListener('DOMContentLoaded', function() {
         return newArray;
     }
     
+    // Create actual firework particle animation
+    function createFireworks(container) {
+        const colors = ['#ff4081', '#e040fb', '#ff6e40', '#ffab40', '#69f0ae', '#40c4ff', '#ffd740', '#ff1744'];
+
+        function launchFirework() {
+            // Random origin at bottom
+            const originX = 10 + Math.random() * 80; // % from left
+            const burstY = 10 + Math.random() * 40; // % from top where it bursts
+
+            // Create the trail (rocket going up)
+            const trail = document.createElement('div');
+            trail.className = 'fw-trail';
+            trail.style.left = originX + '%';
+            trail.style.setProperty('--burst-y', burstY + '%');
+            container.appendChild(trail);
+
+            // After trail reaches top, create burst particles
+            setTimeout(() => {
+                if (trail.parentNode) trail.remove();
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const particleCount = 30 + Math.floor(Math.random() * 20);
+
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'fw-particle';
+                    particle.style.left = originX + '%';
+                    particle.style.top = burstY + '%';
+                    particle.style.backgroundColor = color;
+                    particle.style.boxShadow = `0 0 6px ${color}, 0 0 12px ${color}`;
+
+                    const angle = (Math.PI * 2 * i) / particleCount;
+                    const dist = 70 + Math.random() * 100;
+                    particle.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+                    particle.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+
+                    container.appendChild(particle);
+                    particle.addEventListener('animationend', () => particle.remove());
+                }
+            }, 400);
+        }
+
+        // Launch multiple fireworks with staggered timing
+        for (let i = 0; i < 6; i++) {
+            setTimeout(launchFirework, i * 500);
+        }
+    }
+
     // ========== BALLOON DODGE GAME ==========
     const balloonArea = document.getElementById('balloon-area');
     const balloon = document.getElementById('balloon');
@@ -665,18 +752,109 @@ document.addEventListener('DOMContentLoaded', function() {
         clearInterval(needleSpawner);
         if (collisionChecker) cancelAnimationFrame(collisionChecker);
 
-        balloonMessage.textContent = '🎉 You protected my heart!';
+        // Clear needles
+        balloonArea.querySelectorAll('.needle').forEach(n => n.remove());
+
+        // Show win message popup
+        const msg = document.createElement('div');
+        msg.className = 'balloon-win-message';
+        msg.innerHTML = '🛡️💖 You saved my heart! 💖🥰';
+        balloonScreen.appendChild(msg);
+
+        // Confetti shower
+        createRealConfetti(balloonScreen);
 
         setTimeout(function() {
+            msg.remove();
+            balloonScreen.querySelectorAll('.real-confetti').forEach(c => c.remove());
             balloonScreen.classList.remove('active');
             galleryScreen.classList.add('active');
             showPhotos();
-        }, 1500);
+        }, 4000);
     }
 
-    // ========== DEBUG SHORTCUT (Ctrl+Shift+N to skip to next screen) ==========
+    // Actual confetti shower with colored strips
+    function createRealConfetti(container) {
+        const colors = ['#ff4081', '#e040fb', '#448aff', '#69f0ae', '#ffd740', '#ff6e40', '#f50057', '#00e5ff'];
+
+        for (let i = 0; i < 60; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'real-confetti';
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.backgroundColor = color;
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.width = (5 + Math.random() * 5) + 'px';
+            confetti.style.height = (10 + Math.random() * 15) + 'px';
+            confetti.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+            confetti.style.animationDelay = (Math.random() * 1.5) + 's';
+            // Random horizontal drift
+            const drift = -30 + Math.random() * 60;
+            confetti.style.setProperty('--drift', drift + 'px');
+            container.appendChild(confetti);
+        }
+    }
+
+    // ========== DEBUG SHORTCUTS ==========
+    // Ctrl+Shift+N — trigger win animation + auto-transition to next screen
+    // Ctrl+Shift+S — instant skip (no animation)
     document.addEventListener('keydown', function(e) {
         if (e.ctrlKey && e.shiftKey && e.key === 'N') {
+            e.preventDefault();
+
+            if (gameScreen.classList.contains('active')) {
+                // Trigger catch my love win
+                gameActive = false;
+                clearInterval(timer);
+                clearInterval(heartSpawner);
+                heartsCollected = 10;
+                updateScore();
+                showWinMessage();
+                createConfetti();
+                setTimeout(function() {
+                    gameScreen.classList.remove('active');
+                    document.querySelectorAll('.confetti').forEach(c => c.remove());
+                    secondGameScreen.classList.add('active');
+                    initializeMemoryGame();
+                }, 3000);
+            } else if (secondGameScreen.classList.contains('active')) {
+                // Trigger heart match win
+                const msg = document.createElement('div');
+                msg.className = 'memory-win-message';
+                msg.innerHTML = '🧠✨ You are a genius! ✨💕';
+                gameBoard.parentNode.appendChild(msg);
+                createFireworks(secondGameScreen);
+                setTimeout(() => {
+                    msg.remove();
+                    secondGameScreen.querySelectorAll('.fw-trail, .fw-particle').forEach(f => f.remove());
+                    secondGameScreen.classList.remove('active');
+                    balloonScreen.classList.add('active');
+                }, 5000);
+            } else if (balloonScreen.classList.contains('active')) {
+                // Trigger balloon win
+                balloonGameActive = false;
+                clearInterval(balloonTimer);
+                clearInterval(needleSpawner);
+                if (collisionChecker) cancelAnimationFrame(collisionChecker);
+                balloonArea.querySelectorAll('.needle').forEach(n => n.remove());
+
+                const msg = document.createElement('div');
+                msg.className = 'balloon-win-message';
+                msg.innerHTML = '🛡️💖 You saved my heart! 💖🥰';
+                balloonScreen.appendChild(msg);
+                createRealConfetti(balloonScreen);
+
+                setTimeout(function() {
+                    msg.remove();
+                    balloonScreen.querySelectorAll('.real-confetti').forEach(c => c.remove());
+                    balloonScreen.classList.remove('active');
+                    galleryScreen.classList.add('active');
+                    showPhotos();
+                }, 4000);
+            }
+        }
+
+        // Instant skip — no animations
+        if (e.ctrlKey && e.shiftKey && e.key === 'S') {
             e.preventDefault();
 
             if (gameScreen.classList.contains('active')) {
