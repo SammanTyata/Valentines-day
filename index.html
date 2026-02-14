@@ -2,16 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Valentine's Day Special</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Love animation background -->
+    <div class="love-hearts" id="love-hearts"></div>
+    
     <!-- Main container -->
     <div id="container">
         <!-- Initial screen: Will you be my valentine? -->
         <div id="proposal-screen" class="screen active">
             <h1>Will you be my Valentine?</h1>
+            <div id="no-message" class="no-message"></div>
             <div class="buttons-container">
                 <button id="yes-btn" class="btn">Yes</button>
                 <button id="no-btn" class="btn">No</button>

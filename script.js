@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Create love animation background
+    createLoveAnimation();
+    
     // DOM elements
     const proposalScreen = document.getElementById('proposal-screen');
     const gameScreen = document.getElementById('game-screen');
@@ -34,6 +37,33 @@ document.addEventListener('DOMContentLoaded', function() {
         gameScreen.classList.add('active');
     });
     
+    // Counter for how many times "No" has been pressed
+    let noClickCount = 0;
+    
+    // Humorous messages array
+    const noMessages = [
+        "Are you sure?",
+        "Think again!",
+        "Don't break my heart!",
+        "You're breaking my heart!",
+        "Are you really sure?",
+        "I'll keep asking!",
+        "My heart is breaking!",
+        "You're killing me softly!",
+        "This is getting painful!",
+        "I'm not giving up!",
+        "You're so mean to me!",
+        "I'll just keep growing!",
+        "You're my destiny!",
+        "I believe in us!",
+        "Love conquers all!",
+        "You can't resist forever!",
+        "I'm persistent!",
+        "You're my soulmate!",
+        "I'll wait forever!",
+        "You're stuck with me!"
+    ];
+    
     // Make the "No" button move when hovered or clicked
     noBtn.addEventListener('mouseover', moveButton);
     noBtn.addEventListener('mousemove', moveButton);
@@ -41,11 +71,34 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!this.classList.contains('moving')) {
             moveButton();
             e.preventDefault(); // Prevent default button click behavior
+            
+            // Increment click counter
+            noClickCount++;
+            
+            // Reduce button size
+            const currentScale = 1 - (noClickCount * 0.05); // Reduce by 5% each time
+            const newScale = Math.max(currentScale, 0.3); // Minimum 30% size
+            this.style.transform = `scale(${newScale})`;
+            
+            // Show humorous message in a div instead of alert
+            showMessage(noMessages[noClickCount - 1] || "You're really persistent! But I'm more persistent! 😄");
         }
     });
     
-    startGameBtn.addEventListener('click', startGame);
+    // Function to display message when "No" is clicked
+    function showMessage(message) {
+        const messageDiv = document.getElementById('no-message');
+        messageDiv.textContent = message;
+        messageDiv.style.display = 'block';
+        
+        // Hide message after 2 seconds
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 2000);
+    }
     
+    startGameBtn.addEventListener('click', startGame);
+
     backToStartBtn.addEventListener('click', function() {
         galleryScreen.classList.remove('active');
         proposalScreen.classList.add('active');
@@ -394,5 +447,52 @@ document.addEventListener('DOMContentLoaded', function() {
             [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
         }
         return newArray;
+    }
+    
+    // Function to create love animation background
+    function createLoveAnimation() {
+        const container = document.getElementById('love-hearts');
+        const heartEmojis = ['❤️', '💖', '💘', '💝', '💗', '💓', '💞', '💕'];
+        
+        // Create 30 hearts initially
+        for (let i = 0; i < 30; i++) {
+            createFloatingHeart(container, heartEmojis);
+        }
+        
+        // Create new hearts periodically
+        setInterval(() => {
+            createFloatingHeart(container, heartEmojis);
+        }, 800);
+    }
+    
+    // Function to create a single floating heart
+    function createFloatingHeart(container, heartEmojis) {
+        const heart = document.createElement('div');
+        heart.className = 'love-heart';
+        
+        // Random heart emoji
+        const randomHeart = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+        heart.textContent = randomHeart;
+        
+        // Random position
+        const startPos = Math.random() * 100;
+        heart.style.left = `${startPos}%`;
+        
+        // Random size
+        const size = 0.8 + Math.random() * 1.2; // Between 0.8x and 2x
+        heart.style.fontSize = `${size}rem`;
+        
+        // Random animation duration
+        const duration = 8 + Math.random() * 12; // Between 8-20 seconds
+        heart.style.animationDuration = `${duration}s`;
+        
+        container.appendChild(heart);
+        
+        // Remove heart after animation completes to prevent too many elements
+        setTimeout(() => {
+            if (heart.parentNode) {
+                heart.remove();
+            }
+        }, duration * 1000);
     }
 });
