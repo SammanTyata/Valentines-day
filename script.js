@@ -412,10 +412,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     backToGalleryBtn.addEventListener('click', function() {
         secondGameScreen.classList.remove('active');
-        // Go back to the photos screen since first game was completed
-        galleryScreen.classList.add('active');
-        // Reset game board when leaving
+        proposalScreen.classList.add('active');
         gameBoard.innerHTML = '';
+        resetGame();
     });
     
     // Initialize the memory game

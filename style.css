@@ -12,7 +12,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     position: relative;
 }
 
@@ -280,25 +281,25 @@ h2 {
 
 #photos-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
     margin: 30px 0;
 }
 
 .photo {
     width: 100%;
-    height: 200px;
+    aspect-ratio: 3 / 4;
     object-fit: cover;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border: 3px solid #fff;
-    cursor: pointer; /* Indicate that photos are clickable */
-    touch-action: manipulation; /* Improve touch responsiveness */
+    cursor: pointer;
+    touch-action: manipulation;
 }
 
 @media (max-width: 600px) {
     .photo {
-        height: 150px; /* Smaller photos on mobile */
+        aspect-ratio: 3 / 4;
     }
 }
 
