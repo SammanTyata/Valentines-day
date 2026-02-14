@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Make the "No" button move when hovered or clicked
     noBtn.addEventListener('mouseover', moveButton);
-    noBtn.addEventListener('mousemove', moveButton);
+    // Remove mousemove to make it possible to click
     noBtn.addEventListener('click', function(e) {
         if (!this.classList.contains('moving')) {
             moveButton();
@@ -81,20 +81,25 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.transform = `scale(${newScale})`;
             
             // Show humorous message in a div instead of alert
-            showMessage(noMessages[noClickCount - 1] || "You're really persistent! But I'm more persistent! 😄");
+            const message = noClickCount <= noMessages.length ? noMessages[noClickCount - 1] : "You're really persistent! But I'm more persistent! 😄";
+            showMessage(message);
         }
     });
     
     // Function to display message when "No" is clicked
     function showMessage(message) {
         const messageDiv = document.getElementById('no-message');
-        messageDiv.textContent = message;
-        messageDiv.style.display = 'block';
-        
-        // Hide message after 2 seconds
-        setTimeout(() => {
-            messageDiv.style.display = 'none';
-        }, 2000);
+        if (messageDiv) {
+            messageDiv.textContent = message;
+            messageDiv.style.display = 'block';
+            
+            // Hide message after 2 seconds
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 2000);
+        } else {
+            console.log('Message div not found'); // Debug message
+        }
     }
     
     startGameBtn.addEventListener('click', startGame);
@@ -110,21 +115,21 @@ document.addEventListener('DOMContentLoaded', function() {
     function moveButton() {
         const container = document.querySelector('.buttons-container');
         const containerRect = container.getBoundingClientRect();
-        
+
         // Calculate max positions within the container
         const maxX = containerRect.width - noBtn.offsetWidth - 20;
         const maxY = containerRect.height - noBtn.offsetHeight - 20;
-        
-        // Generate random positions
-        const randomX = Math.floor(Math.random() * maxX);
-        const randomY = Math.floor(Math.random() * maxY);
-        
+
+        // Generate random positions (but not too far)
+        const randomX = Math.floor(Math.random() * (maxX * 0.7)); // Keep within 70% of max
+        const randomY = Math.floor(Math.random() * (maxY * 0.7)); // Keep within 70% of max
+
         // Apply new position
         noBtn.style.position = 'absolute';
         noBtn.style.left = randomX + 'px';
         noBtn.style.top = randomY + 'px';
         noBtn.classList.add('moving');
-        
+
         // Remove the moving class after animation completes to allow repositioning
         setTimeout(() => {
             noBtn.classList.remove('moving');

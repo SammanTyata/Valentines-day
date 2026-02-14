@@ -76,6 +76,9 @@ body::before {
     font-weight: bold;
     display: none;
     animation: pulse 0.5s;
+    text-align: center;
+    z-index: 20; /* Ensure it appears above other elements */
+    position: relative;
 }
 
 @keyframes pulse {
