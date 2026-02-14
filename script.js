@@ -64,9 +64,9 @@ document.addEventListener('DOMContentLoaded', function() {
         "You're stuck with me! 😜"
     ];
     
-    // Make the "No" button move when hovered or clicked
-    noBtn.addEventListener('mouseover', moveButton);
-    // Remove mousemove to make it possible to click
+    // Make the "No" button move when touched/clicked
+    noBtn.addEventListener('mouseover', moveButton); // For desktop
+    noBtn.addEventListener('touchstart', moveButton); // For mobile touch devices
     noBtn.addEventListener('click', function(e) {
         if (!this.classList.contains('moving')) {
             moveButton();
