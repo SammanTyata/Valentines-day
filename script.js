@@ -243,8 +243,8 @@ document.addEventListener('DOMContentLoaded', function() {
         heart.style.left = randomX + 'px';
         heart.style.top = '-40px';
 
-        // Random size
-        const randomSize = 1.5 + Math.random() * 1;
+        // Random size — bigger for easier tapping
+        const randomSize = 2.5 + Math.random() * 1;
         heart.style.fontSize = `${randomSize}rem`;
 
         // Random fall duration (CSS animation) — 3s to 5s (slower)
