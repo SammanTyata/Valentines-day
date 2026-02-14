@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Day Special</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Main container -->
+    <div id="container">
+        <!-- Initial screen: Will you be my valentine? -->
+        <div id="proposal-screen" class="screen active">
+            <h1>Will you be my Valentine?</h1>
+            <div class="buttons-container">
+                <button id="yes-btn" class="btn">Yes</button>
+                <button id="no-btn" class="btn">No</button>
+            </div>
+        </div>
+
+        <!-- Mini game screen -->
+        <div id="game-screen" class="screen">
+            <h2>Collect the Hearts!</h2>
+            <p>Click on the hearts to collect them. Collect 10 in 10 seconds to see something special!</p>
+            <div id="game-area">
+                <div id="score">Hearts collected: <span id="score-count">0</span>/10</div>
+                <div id="timer">Time: 10s</div>
+                <div id="hearts-container"></div>
+            </div>
+            <button id="start-game-btn" class="btn">Start Game</button>
+        </div>
+
+        <!-- Photo gallery screen -->
+        <div id="gallery-screen" class="screen">
+            <h2>Our Beautiful Moments</h2>
+            <div id="photos-container">
+                <!-- Photos will be added here dynamically -->
+            </div>
+            <button id="back-to-start" class="btn">Back to Beginning</button>
+        </div>
+        
+        <!-- Modal for enlarged photos -->
+        <div id="photo-modal" class="modal">
+            <span id="close-modal" class="close">&times;</span>
+            <img id="modal-img" class="modal-content">
+        </div>
+        
+        <!-- Second game screen -->
+        <div id="second-game-screen" class="screen">
+            <h2>Memory Match Game</h2>
+            <p>Match the pairs of hearts to reveal our special moments!</p>
+            <div id="memory-game-container">
+                <div id="game-board"></div>
+                <div id="moves-counter">Moves: <span id="moves">0</span></div>
+            </div>
+            <button id="back-to-gallery" class="btn">Back to Photos</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
