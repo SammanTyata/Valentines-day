@@ -189,30 +189,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
     }
     
+    let heartSpawner;
+
     // Function to start the heart collection game
     function startGame() {
         gameActive = true;
         startGameBtn.disabled = true;
-        heartsContainer.innerHTML = ''; // Clear previous hearts
+        heartsContainer.innerHTML = '';
         score = 0;
         heartsCollected = 0;
-        timeLeft = 10; // Changed to 10 seconds
+        timeLeft = 10;
         updateScore();
         updateTimer();
-        
-        // Create initial hearts
+
+        // Create hearts periodically
         createHeart();
-        
-        // Create new hearts periodically
-        setInterval(createHeart, 600); // Hearts appear every 600ms
-        
+        heartSpawner = setInterval(createHeart, 500);
+
         // Start the countdown timer
         timer = setInterval(function() {
             timeLeft--;
             updateTimer();
-            
             if (timeLeft <= 0) {
                 clearInterval(timer);
+                clearInterval(heartSpawner);
                 endGame();
             }
         }, 1000);
@@ -225,68 +225,49 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Heart emojis for variety
+    const gameHearts = ['❤️', '💖', '💗', '💓', '💕'];
+
     // Function to create a heart element at a random position
     function createHeart() {
         if (!gameActive) return;
-        
+
         const heart = document.createElement('div');
-        heart.className = 'heart falling-heart';
-        heart.innerHTML = '❤️';
-        
-        // Random horizontal position at the top
-        const maxX = heartsContainer.clientWidth - 50;
+        heart.className = 'heart';
+        heart.textContent = gameHearts[Math.floor(Math.random() * gameHearts.length)];
+
+        // Random horizontal position
+        const maxX = heartsContainer.clientWidth - 40;
         const randomX = Math.floor(Math.random() * maxX);
-        
         heart.style.left = randomX + 'px';
-        heart.style.top = '-50px'; // Start above the container
-        
-        // Random size to make it more challenging (slightly smaller)
-        const randomSize = 0.9 + Math.random() * 0.6; // Between 0.9x and 1.5x size
+        heart.style.top = '-40px';
+
+        // Random size
+        const randomSize = 1.5 + Math.random() * 1;
         heart.style.fontSize = `${randomSize}rem`;
-        
-        // Add click event to collect the heart
+
+        // Random fall duration (CSS animation) — 1.5s to 3s
+        const duration = 1.5 + Math.random() * 1.5;
+        heart.style.animationDuration = duration + 's';
+
+        // Collect on tap/click
         heart.addEventListener('click', function() {
             if (!gameActive) return;
-            
-            // Remove the heart
             this.remove();
-            
-            // Increase score
             heartsCollected++;
             updateScore();
-            
-            // Check if goal is reached (now based on time and score)
-            if (heartsCollected >= 10) { // Target of 10 hearts
+            if (heartsCollected >= 10) {
                 clearInterval(timer);
                 endGame();
             }
         });
-        
+
         heartsContainer.appendChild(heart);
 
-        // Animate the heart falling
-        const fallSpeed = 1 + Math.random() * 4; // Random speed between 1-5px per frame
-        const fallInterval = setInterval(() => {
-            if (!gameActive || !heart.parentNode) {
-                clearInterval(fallInterval);
-                return;
-            }
-
-            // Get current position
-            const currentTop = parseInt(heart.style.top);
-            const newTop = currentTop + fallSpeed;
-
-            // Update position (allow going past bottom, will be removed by timeout)
-            heart.style.top = newTop + 'px';
-        }, 30); // Update every 30ms for smooth animation
-
-        // Auto-remove heart after exactly 2 seconds
-        setTimeout(() => {
-            if (heart.parentNode && gameActive) {
-                clearInterval(fallInterval); // Stop falling
-                heart.remove();
-            }
-        }, 2000); // Heart disappears after 2 seconds if not caught
+        // Remove after animation ends
+        heart.addEventListener('animationend', function() {
+            if (heart.parentNode) heart.remove();
+        });
     }
     
     
@@ -385,12 +366,15 @@ document.addEventListener('DOMContentLoaded', function() {
         heartsContainer.innerHTML = '';
         score = 0;
         heartsCollected = 0;
-        timeLeft = 30;
+        timeLeft = 10;
         updateScore();
         updateTimer();
         startGameBtn.disabled = false;
         gameActive = false;
-        firstGameCompleted = false; // Reset the completion flag
+        firstGameCompleted = false;
+        if (heartSpawner) {
+            clearInterval(heartSpawner);
+        }
 
         if (timer) {
             clearInterval(timer);
