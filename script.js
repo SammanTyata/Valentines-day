@@ -40,28 +40,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Counter for how many times "No" has been pressed
     let noClickCount = 0;
     
-    // Humorous messages array
+    // Humorous messages array with funny emojis
     const noMessages = [
-        "Are you sure?",
-        "Think again!",
-        "Don't break my heart!",
-        "You're breaking my heart!",
-        "Are you really sure?",
-        "I'll keep asking!",
-        "My heart is breaking!",
-        "You're killing me softly!",
-        "This is getting painful!",
-        "I'm not giving up!",
-        "You're so mean to me!",
-        "I'll just keep growing!",
-        "You're my destiny!",
-        "I believe in us!",
-        "Love conquers all!",
-        "You can't resist forever!",
-        "I'm persistent!",
-        "You're my soulmate!",
-        "I'll wait forever!",
-        "You're stuck with me!"
+        "Are you sure? 😢",
+        "Think again! 🥺",
+        "Don't break my heart! 💔",
+        "You're breaking my heart! 😭",
+        "Are you really sure? 🤔",
+        "I'll keep asking! 😄",
+        "My heart is breaking! 💔😭",
+        "You're killing me softly! 😅",
+        "This is getting painful! 😰",
+        "I'm not giving up! 😎",
+        "You're so mean to me! 😡",
+        "I'll just keep growing! 🌱",
+        "You're my destiny! ✨",
+        "I believe in us! 💑",
+        "Love conquers all! ❤️",
+        "You can't resist forever! 😏",
+        "I'm persistent! 🙌",
+        "You're my soulmate! 👫",
+        "I'll wait forever! ⏳",
+        "You're stuck with me! 😜"
     ];
     
     // Make the "No" button move when hovered or clicked
@@ -272,11 +272,19 @@ document.addEventListener('DOMContentLoaded', function() {
             img.src = photoUrl;
             img.alt = 'Valentine Memory';
             img.className = 'photo';
+            img.loading = 'lazy'; // Improve loading performance
             
             // Add click event to open modal
             img.addEventListener('click', function() {
                 openModal(photoUrl);
             });
+            
+            // Handle image loading errors
+            img.onerror = function() {
+                // Fallback if image fails to load
+                this.src = 'https://placehold.co/300x300/ffafbd/ffffff?text=Image+Not+Found';
+                this.alt = 'Image not loaded';
+            };
             
             photosContainer.appendChild(img);
         });

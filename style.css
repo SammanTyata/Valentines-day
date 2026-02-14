@@ -12,7 +12,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
+    overflow-x: hidden; /* Allow vertical scrolling */
     position: relative;
 }
 
@@ -387,8 +387,12 @@ h2 {
 
 @media (max-width: 600px) {
     #game-board {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 5px;
+    }
+    
+    .card {
+        font-size: 1.5rem; /* Smaller font on mobile */
     }
 }
 
