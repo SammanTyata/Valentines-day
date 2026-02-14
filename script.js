@@ -246,18 +246,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const randomSize = 1.5 + Math.random() * 1;
         heart.style.fontSize = `${randomSize}rem`;
 
-        // Random fall duration (CSS animation) — 1.5s to 3s
-        const duration = 1.5 + Math.random() * 1.5;
+        // Random fall duration (CSS animation) — 3s to 5s (slower)
+        const duration = 3 + Math.random() * 2;
         heart.style.animationDuration = duration + 's';
 
         // Collect on tap/click
-        heart.addEventListener('click', function() {
+        heart.addEventListener('click', function(e) {
             if (!gameActive) return;
+
+            // Burst animation
+            const rect = this.getBoundingClientRect();
+            const containerRect = heartsContainer.getBoundingClientRect();
+            const cx = rect.left - containerRect.left + rect.width / 2;
+            const cy = rect.top - containerRect.top + rect.height / 2;
             this.remove();
+            createBurst(cx, cy);
+
             heartsCollected++;
             updateScore();
             if (heartsCollected >= 10) {
                 clearInterval(timer);
+                clearInterval(heartSpawner);
                 endGame();
             }
         });
@@ -268,6 +277,29 @@ document.addEventListener('DOMContentLoaded', function() {
         heart.addEventListener('animationend', function() {
             if (heart.parentNode) heart.remove();
         });
+    }
+
+    // Create a burst of mini hearts when a heart is tapped
+    function createBurst(x, y) {
+        const burstEmojis = ['💕', '✨', '💗', '💖', '🥰'];
+        for (let i = 0; i < 6; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'burst-particle';
+            particle.textContent = burstEmojis[Math.floor(Math.random() * burstEmojis.length)];
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+
+            // Random direction
+            const angle = (Math.PI * 2 * i) / 6;
+            const dist = 40 + Math.random() * 30;
+            particle.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+            particle.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+
+            heartsContainer.appendChild(particle);
+            particle.addEventListener('animationend', function() {
+                particle.remove();
+            });
+        }
     }
     
     
