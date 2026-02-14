@@ -12,7 +12,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow-x: hidden; /* Allow vertical scrolling */
+    overflow: hidden;
     position: relative;
 }
 
@@ -41,7 +41,7 @@ body::before {
 
 .love-heart {
     position: absolute;
-    font-size: 1.5rem;
+    font-size: 2.5rem;
     opacity: 0.7;
     animation: float 15s infinite linear;
 }
@@ -67,35 +67,45 @@ body::before {
 }
 
 .no-message {
-    margin: 20px 0;
     padding: 10px 20px;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
-    font-size: 1.2rem;
-    color: #d63384;
-    font-weight: bold;
-    display: none;
-    animation: pulse 0.5s;
+    border-radius: 12px;
+    font-size: 1rem;
+    color: #c2185b;
+    font-weight: 500;
     text-align: center;
-    z-index: 20; /* Ensure it appears above other elements */
-    position: relative;
+    margin: 15px auto;
+    max-width: 320px;
+    min-height: 42px;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.no-message.visible {
+    background-color: rgba(255, 255, 255, 0.5);
+    visibility: visible;
+    opacity: 1;
 }
 
 @keyframes pulse {
-    0% { transform: scale(0.9); opacity: 0; }
-    70% { transform: scale(1.1); }
-    100% { transform: scale(1); opacity: 1; }
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 1; }
 }
 
 .screen {
     display: none;
-    padding: 40px;
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(10px);
+    padding: 60px 40px;
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     animation: fadeIn 0.5s ease-in-out;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    position: relative;
 }
+
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
@@ -107,10 +117,18 @@ body::before {
 }
 
 h1 {
-    font-size: 2.8rem;
-    color: #d63384;
-    margin-bottom: 30px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 2.6rem;
+    color: #c2185b;
+    margin: 0 0 30px 0;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+h1::before {
+    content: '💌';
+    display: block;
+    font-size: 2.5rem;
+    margin-bottom: 12px;
 }
 
 h2 {
@@ -122,12 +140,15 @@ h2 {
 .buttons-container {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 30px;
     margin-top: 30px;
     flex-direction: column; /* Stack buttons vertically on mobile */
     align-items: center;
-    position: relative; /* Ensure proper positioning for moved buttons */
-    min-height: 150px; /* Ensure enough space for button movement */
+    position: relative; /* Ensure proper positioning */
+    min-height: 150px; /* Ensure enough space */
+    align-items: center; /* Center items */
+    z-index: 1; /* Lower z-index to ensure message appears above */
 }
 
 @media (min-width: 600px) {
@@ -137,38 +158,44 @@ h2 {
 }
 
 .btn {
-    padding: 15px 30px;
-    font-size: 1.2rem;
+    padding: 14px 36px;
+    font-size: 1.05rem;
     border: none;
-    border-radius: 50px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: bold;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    min-height: 50px; /* Ensure buttons are large enough for touch */
-    min-width: 120px; /* Ensure buttons are large enough for touch */
-    touch-action: manipulation; /* Improve touch responsiveness */
+    transition: all 0.2s ease;
+    font-weight: 600;
+    box-shadow: none;
+    min-height: 48px;
+    min-width: 120px;
+    touch-action: manipulation;
+    position: relative;
+    overflow: hidden;
 }
 
+
 #yes-btn {
-    background: linear-gradient(to right, #e03e7e, #f86d92);
+    background: #c2185b;
     color: white;
 }
 
 #yes-btn:hover {
-    transform: scale(1.2);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+    transform: scale(1.05);
+    background: #ad1457;
+    box-shadow: 0 6px 20px rgba(194, 24, 91, 0.3);
 }
 
 #no-btn {
-    background: linear-gradient(to right, #6c757d, #adb5bd);
-    color: white;
+    background: transparent;
+    color: #999;
+    border: 1.5px solid #ddd;
+    box-shadow: none;
     position: relative;
 }
 
 #no-btn:hover {
-    transform: scale(0.8);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+    transform: scale(0.95);
+    border-color: #ccc;
 }
 
 #game-screen {

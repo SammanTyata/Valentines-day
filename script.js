@@ -40,6 +40,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Counter for how many times "No" has been pressed
     let noClickCount = 0;
     
+    // Store the current scale of the buttons
+    let noButtonScale = 1;
+    let yesButtonScale = 1;
+    
     // Humorous messages array with funny emojis
     const noMessages = [
         "Are you sure? 😢",
@@ -64,41 +68,75 @@ document.addEventListener('DOMContentLoaded', function() {
         "You're stuck with me! 😜"
     ];
     
-    // Make the "No" button move when touched/clicked
-    noBtn.addEventListener('mouseover', moveButton); // For desktop
-    noBtn.addEventListener('touchstart', moveButton); // For mobile touch devices
+    // Make the "No" button just shrink when clicked (no movement)
     noBtn.addEventListener('click', function(e) {
-        if (!this.classList.contains('moving')) {
-            moveButton();
+        if (!this.classList.contains('shrinking')) {
             e.preventDefault(); // Prevent default button click behavior
             
             // Increment click counter
             noClickCount++;
             
-            // Reduce button size
-            const currentScale = 1 - (noClickCount * 0.05); // Reduce by 5% each time
-            const newScale = Math.max(currentScale, 0.3); // Minimum 30% size
-            this.style.transform = `scale(${newScale})`;
+            // Reduce button size - ensure it accumulates properly
+            noButtonScale = Math.max(noButtonScale - 0.05, 0.3); // Reduce by 5%, minimum 30%
             
-            // Show humorous message in a div instead of alert
-            const message = noClickCount <= noMessages.length ? noMessages[noClickCount - 1] : "You're really persistent! But I'm more persistent! 😄";
-            showMessage(message);
+            // Apply transform to the entire button to make it shrink
+            this.style.transform = `scale(${noButtonScale})`;
+            this.style.transformOrigin = 'center center';
+            
+            this.classList.add('shrinking'); // Add class to prevent rapid clicking
+            
+            // Grow the Yes button
+            yesButtonScale = Math.min(yesButtonScale + 0.04, 3); // Grow by 4%, max 3x
+            yesBtn.style.transform = `scale(${yesButtonScale})`;
+            yesBtn.style.transformOrigin = 'center center';
+
+            // Show humorous message or start floating if messages are done
+            if (noClickCount <= noMessages.length) {
+                const message = noMessages[noClickCount - 1];
+                showMessage(message);
+
+                // Remove the shrinking class after a short delay to allow for repeated clicks
+                setTimeout(() => {
+                    this.classList.remove('shrinking');
+                }, 300);
+            } else {
+                // Messages are done — remove No button, show permanent message
+                showMessage("Yes is the only option 💕", true);
+                this.classList.remove('shrinking');
+                this.style.display = 'none';
+
+                // Center the Yes button
+                yesBtn.style.display = 'block';
+                yesBtn.style.margin = '0 auto';
+            }
         }
     });
+
     
+    // Track the hide timeout so we can clear it on repeated clicks
+    let messageTimeout = null;
+
     // Function to display message when "No" is clicked
-    function showMessage(message) {
+    // If permanent is true, the message stays until Yes is clicked
+    function showMessage(message, permanent) {
         const messageDiv = document.getElementById('no-message');
         if (messageDiv) {
+            // Clear any existing timeout so it doesn't hide early
+            if (messageTimeout) {
+                clearTimeout(messageTimeout);
+                messageTimeout = null;
+            }
+
             messageDiv.textContent = message;
-            messageDiv.style.display = 'block';
-            
-            // Hide message after 2 seconds
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-            }, 2000);
-        } else {
-            console.log('Message div not found'); // Debug message
+            messageDiv.classList.add('visible');
+
+            if (!permanent) {
+                // Hide message after 4 seconds
+                messageTimeout = setTimeout(() => {
+                    messageDiv.classList.remove('visible');
+                    messageTimeout = null;
+                }, 4000);
+            }
         }
     }
     
@@ -109,6 +147,21 @@ document.addEventListener('DOMContentLoaded', function() {
         proposalScreen.classList.add('active');
         resetGame();
         firstGameCompleted = false; // Reset the completion flag
+        
+        // Reset button scales and floating state
+        noButtonScale = 1;
+        yesButtonScale = 1;
+        noClickCount = 0;
+
+        const noBtnEl = document.getElementById('no-btn');
+        if (noBtnEl) {
+            noBtnEl.style.transform = '';
+            noBtnEl.style.transition = '';
+            noBtnEl.style.display = '';
+        }
+        yesBtn.style.transform = 'scale(1)';
+        yesBtn.style.display = '';
+        yesBtn.style.margin = '';
     });
     
     // Function to move the "No" button randomly
@@ -492,7 +545,7 @@ document.addEventListener('DOMContentLoaded', function() {
         heart.style.left = `${startPos}%`;
         
         // Random size
-        const size = 0.8 + Math.random() * 1.2; // Between 0.8x and 2x
+        const size = 1.5 + Math.random() * 1.5; // Between 1.5x and 3x
         heart.style.fontSize = `${size}rem`;
         
         // Random animation duration
