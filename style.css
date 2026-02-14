@@ -421,6 +421,83 @@ h2 {
     }
 }
 
+/* Balloon dodge game styles */
+#balloon-screen {
+    text-align: center;
+    padding: 20px 15px;
+}
+
+#balloon-timer {
+    font-size: 1.3rem;
+    color: #c2185b;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+#balloon-area {
+    position: relative;
+    height: 45vh;
+    width: 100%;
+    max-width: 500px;
+    margin: 10px auto;
+    border: 2px dashed rgba(194, 24, 91, 0.3);
+    border-radius: 16px;
+    background-color: rgba(255, 255, 255, 0.5);
+    overflow: hidden;
+    touch-action: none;
+    cursor: none;
+}
+
+#balloon-area.hit {
+    border-color: #e53935;
+    background-color: rgba(229, 57, 53, 0.1);
+}
+
+#balloon {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2.5rem;
+    user-select: none;
+    pointer-events: none;
+    transition: left 0.05s linear;
+}
+
+.needle {
+    position: absolute;
+    font-size: 1.5rem;
+    user-select: none;
+    pointer-events: none;
+    animation: needleFall linear forwards;
+    will-change: transform;
+    display: inline-block;
+}
+
+.needle span {
+    display: inline-block;
+    transform: rotate(315deg);
+}
+
+@keyframes needleFall {
+    from { transform: translateY(0); }
+    to { transform: translateY(calc(45vh + 30px)); }
+}
+
+#start-balloon-btn {
+    background: #c2185b;
+    color: white;
+    margin-top: 10px;
+}
+
+#balloon-message {
+    margin-top: 10px;
+    font-size: 1.1rem;
+    color: #c2185b;
+    font-weight: 600;
+    min-height: 30px;
+}
+
 /* Modal styles for enlarged photos */
 .modal {
     display: none;

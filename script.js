@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const scoreCount = document.getElementById('score-count');
     const timerDisplay = document.getElementById('timer');
     const backToStartBtn = document.getElementById('back-to-start');
+    const balloonScreen = document.getElementById('balloon-screen');
     
     // Game variables
     let score = 0;
@@ -415,23 +416,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Second game functionality - Memory Card Game
     const secondGameScreen = document.getElementById('second-game-screen');
-    const backToGalleryBtn = document.getElementById('back-to-gallery');
     const gameBoard = document.getElementById('game-board');
     const movesDisplay = document.getElementById('moves');
-    
+
     let moves = 0;
     let cards = [];
     let flippedCards = [];
     let matchedPairs = 0;
     const totalPairs = 8; // 4x4 grid = 16 cards = 8 pairs
-    
-    
-    backToGalleryBtn.addEventListener('click', function() {
-        secondGameScreen.classList.remove('active');
-        proposalScreen.classList.add('active');
-        gameBoard.innerHTML = '';
-        resetGame();
-    });
     
     // Initialize the memory game
     function initializeMemoryGame() {
@@ -494,12 +486,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Check for win
                 if (matchedPairs === totalPairs) {
                     setTimeout(() => {
-                        // Player wins! Show the photos
+                        // Player wins! Go to balloon dodge game
                         secondGameScreen.classList.remove('active');
-                        galleryScreen.classList.add('active');
-                        showPhotos();
-                        
-                        // Optionally, you could add a celebration effect here
+                        balloonScreen.classList.add('active');
                     }, 500);
                 }
             } else {
@@ -530,6 +519,190 @@ document.addEventListener('DOMContentLoaded', function() {
         return newArray;
     }
     
+    // ========== BALLOON DODGE GAME ==========
+    const balloonArea = document.getElementById('balloon-area');
+    const balloon = document.getElementById('balloon');
+    const balloonTimerDisplay = document.getElementById('balloon-timer');
+    const startBalloonBtn = document.getElementById('start-balloon-btn');
+    const balloonMessage = document.getElementById('balloon-message');
+
+    let balloonGameActive = false;
+    let balloonTimer = null;
+    let needleSpawner = null;
+    let collisionChecker = null;
+    let balloonTimeLeft = 30;
+
+    startBalloonBtn.addEventListener('click', startBalloonGame);
+
+    function startBalloonGame() {
+        balloonGameActive = true;
+        balloonTimeLeft = 30;
+        startBalloonBtn.style.display = 'none';
+        balloonMessage.textContent = '';
+        balloonArea.classList.remove('hit');
+
+        // Clear any existing needles
+        balloonArea.querySelectorAll('.needle').forEach(n => n.remove());
+
+        // Reset balloon position
+        balloon.style.left = '50%';
+
+        updateBalloonTimer();
+
+        // Spawn needles
+        needleSpawner = setInterval(spawnNeedle, 600);
+
+        // Countdown
+        balloonTimer = setInterval(function() {
+            balloonTimeLeft--;
+            updateBalloonTimer();
+
+            // Last 10 seconds — increase difficulty
+            if (balloonTimeLeft === 10) {
+                clearInterval(needleSpawner);
+                needleSpawner = setInterval(spawnNeedle, 350);
+            }
+
+            if (balloonTimeLeft <= 0) {
+                balloonWin();
+            }
+        }, 1000);
+
+        // Collision detection loop
+        collisionChecker = requestAnimationFrame(checkCollisions);
+    }
+
+    function updateBalloonTimer() {
+        balloonTimerDisplay.textContent = `⏳ ${balloonTimeLeft}s`;
+    }
+
+    // Balloon follows mouse/touch
+    balloonArea.addEventListener('mousemove', function(e) {
+        if (!balloonGameActive) return;
+        const rect = balloonArea.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const clamped = Math.max(20, Math.min(x, rect.width - 20));
+        balloon.style.left = clamped + 'px';
+        balloon.style.transform = 'translateX(-50%)';
+    });
+
+    balloonArea.addEventListener('touchmove', function(e) {
+        if (!balloonGameActive) return;
+        e.preventDefault();
+        const rect = balloonArea.getBoundingClientRect();
+        const touch = e.touches[0];
+        const x = touch.clientX - rect.left;
+        const clamped = Math.max(20, Math.min(x, rect.width - 20));
+        balloon.style.left = clamped + 'px';
+        balloon.style.transform = 'translateX(-50%)';
+    }, { passive: false });
+
+    function spawnNeedle() {
+        if (!balloonGameActive) return;
+
+        const needle = document.createElement('div');
+        needle.className = 'needle';
+        needle.innerHTML = '<span>📌</span>';
+
+        const maxX = balloonArea.clientWidth - 30;
+        needle.style.left = Math.floor(Math.random() * maxX) + 'px';
+        needle.style.top = '-30px';
+
+        // Faster fall in last 10 seconds
+        const duration = balloonTimeLeft <= 10 ? (1 + Math.random() * 1) : (2 + Math.random() * 2);
+        needle.style.animationDuration = duration + 's';
+
+        balloonArea.appendChild(needle);
+
+        needle.addEventListener('animationend', function() {
+            if (needle.parentNode) needle.remove();
+        });
+    }
+
+    function checkCollisions() {
+        if (!balloonGameActive) return;
+
+        const bRect = balloon.getBoundingClientRect();
+        // Shrink balloon hitbox for fairness
+        const bHitbox = {
+            left: bRect.left + 8,
+            right: bRect.right - 8,
+            top: bRect.top + 8,
+            bottom: bRect.bottom - 5
+        };
+
+        const needles = balloonArea.querySelectorAll('.needle');
+        for (const needle of needles) {
+            const nRect = needle.getBoundingClientRect();
+            // Check overlap
+            if (
+                bHitbox.left < nRect.right &&
+                bHitbox.right > nRect.left &&
+                bHitbox.top < nRect.bottom &&
+                bHitbox.bottom > nRect.top
+            ) {
+                balloonGameOver();
+                return;
+            }
+        }
+
+        collisionChecker = requestAnimationFrame(checkCollisions);
+    }
+
+    function balloonGameOver() {
+        balloonGameActive = false;
+        clearInterval(balloonTimer);
+        clearInterval(needleSpawner);
+        balloonArea.classList.add('hit');
+        balloonMessage.textContent = 'You popped my heart 😭💔 Try again!';
+        startBalloonBtn.textContent = 'Retry';
+        startBalloonBtn.style.display = '';
+    }
+
+    function balloonWin() {
+        balloonGameActive = false;
+        clearInterval(balloonTimer);
+        clearInterval(needleSpawner);
+        if (collisionChecker) cancelAnimationFrame(collisionChecker);
+
+        balloonMessage.textContent = '🎉 You protected my heart!';
+
+        setTimeout(function() {
+            balloonScreen.classList.remove('active');
+            galleryScreen.classList.add('active');
+            showPhotos();
+        }, 1500);
+    }
+
+    // ========== DEBUG SHORTCUT (Ctrl+Shift+N to skip to next screen) ==========
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.shiftKey && e.key === 'N') {
+            e.preventDefault();
+
+            if (gameScreen.classList.contains('active')) {
+                gameActive = false;
+                clearInterval(timer);
+                clearInterval(heartSpawner);
+                gameScreen.classList.remove('active');
+                secondGameScreen.classList.add('active');
+                initializeMemoryGame();
+            } else if (secondGameScreen.classList.contains('active')) {
+                secondGameScreen.classList.remove('active');
+                balloonScreen.classList.add('active');
+            } else if (balloonScreen.classList.contains('active')) {
+                balloonGameActive = false;
+                clearInterval(balloonTimer);
+                clearInterval(needleSpawner);
+                if (collisionChecker) cancelAnimationFrame(collisionChecker);
+                balloonScreen.classList.remove('active');
+                galleryScreen.classList.add('active');
+                showPhotos();
+            }
+        }
+    });
+
+    // ========== LOVE ANIMATION ==========
+
     // Function to create love animation background
     function createLoveAnimation() {
         const container = document.getElementById('love-hearts');
